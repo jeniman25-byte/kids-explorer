@@ -8,11 +8,9 @@
     "build:mp-weixin": "uni build -p mp-weixin"
   },
   "dependencies": {
-    "@dcloudio/uni-app": "latest",
-    "@dcloudio/uni-cli-i18n": "^2.0.2-5000720260410001",
-    "@dcloudio/uni-cli-shared": "^2.0.2-5000720260410001",
-    "@dcloudio/uni-components": "latest",
-    "@dcloudio/uni-mp-weixin": "latest",
+    "@dcloudio/uni-app": "vue3",
+    "@dcloudio/uni-components": "vue3",
+    "@dcloudio/uni-mp-weixin": "vue3",
     "pinia": "^3.0.3",
     "semver": "^7.7.4",
     "vue": "^3.5.22",
@@ -20,7 +18,7 @@
   },
   "devDependencies": {
     "@dcloudio/types": "latest",
-    "@dcloudio/vite-plugin-uni": "latest",
+    "@dcloudio/vite-plugin-uni": "vue3",
     "sass": "^1.93.2",
     "typescript": "^5.9.3",
     "vite": "^5.4.21"
