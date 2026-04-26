@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite'
-import uni from '@dcloudio/vite-plugin-uni'
+import uniModule from '@dcloudio/vite-plugin-uni'
+
+const uni = ((uniModule as any).default ?? uniModule) as () => any
 
 export default defineConfig({
   plugins: [uni()],
