@@ -1,0 +1,16 @@
+{
+  "mp-weixin": {
+    "appid": "YOUR_APPID",
+    "plugins": {
+      "WechatSI": {
+        "version": "0.3.5",
+        "provider": "wx069ba97219f66d99"
+      }
+    },
+    "permission": {
+      "scope.record": {
+        "desc": "需要录音权限来听你说的食物、动物、花草名称哦～"
+      }
+    }
+  }
+}

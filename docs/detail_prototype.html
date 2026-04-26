@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>小探索家 — 多视角原型 v2</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:#171727;min-height:100vh;
+  display:flex;justify-content:center;align-items:flex-start;
+  padding:40px 20px 60px;gap:48px;flex-wrap:wrap;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone-wrap{display:flex;flex-direction:column;align-items:center}
+.phone{
+  width:390px;height:844px;background:#FFFBF0;border-radius:54px;
+  box-shadow:0 32px 80px rgba(0,0,0,.55),0 0 0 12px #222,0 0 0 14px #555;
+  overflow:hidden;position:relative;flex-shrink:0;
+}
+.phone-label{color:#9494a5;text-align:center;margin-top:12px;font-size:12px;letter-spacing:1px}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:128px;height:34px;background:#222;border-radius:0 0 20px 20px;z-index:100}
+.bar{height:46px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 7px;font-size:12px;font-weight:700;color:#3D2C00;position:relative;z-index:50}
+.page{width:100%;height:798px;overflow:hidden;position:relative;background:#FFFBF0}
+.tag{position:absolute;top:14px;left:16px;background:rgba(61,44,0,.12);color:#3D2C00;font-size:11px;font-weight:800;padding:4px 10px;border-radius:10px;z-index:20}
+.topbar{display:flex;align-items:center;padding:8px 16px 6px;gap:10px}
+.back{width:38px;height:38px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 3px 8px rgba(0,0,0,.1)}
+.title{font-size:20px;font-weight:900;color:#3D2C00;flex:1;text-align:center}
+.pill{font-size:11px;font-weight:900;padding:4px 10px;border-radius:20px;color:#fff}
+.tabs{display:flex;margin:0 16px 10px;gap:8px}
+.tab{flex:1;height:42px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;cursor:pointer}
+.tab-on{background:#FFB347;color:#fff;box-shadow:0 4px 12px rgba(255,179,71,.4)}
+.tab-off{background:#F5EDD8;color:#A07840}
+.sec{padding:6px 18px 5px;font-size:14px;font-weight:900;color:#3D2C00}
+.card{background:#fff;border-radius:20px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+
+/* ── 主图区 ── */
+.hero{margin:0 16px 10px;border-radius:24px;height:198px;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.1)}
+.hero-emoji{font-size:102px;filter:drop-shadow(0 8px 16px rgba(0,0,0,.15))}
+.view-label{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);background:rgba(61,44,0,.75);color:#FFD166;font-size:13px;font-weight:900;padding:4px 14px;border-radius:20px}
+.badge{position:absolute;top:12px;right:12px;background:#fff;border-radius:10px;font-size:11px;font-weight:900;padding:3px 9px}
+
+/* ── 四面方向卡 ── */
+.grid4{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px 10px}
+.dir{height:78px;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;transition:transform .15s;position:relative}
+.dir:hover{transform:scale(.97)}
+.dir.sel{box-shadow:0 0 0 3px #FFB347,0 4px 16px rgba(255,179,71,.35)}
+.dir-e{font-size:28px}.dir-n{font-size:14px;font-weight:900}.dir-s{font-size:11px;opacity:.72}
+
+/* ── 四张缩略 ── */
+.thumbs4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 16px}
+.thumb4{height:72px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer}
+.thumb4.sel{box-shadow:0 0 0 3px #FFB347}
+.t4e{font-size:24px}.t4n{font-size:11px;font-weight:900;color:#3D2C00}
+
+.btns{display:flex;gap:10px;padding:10px 16px 0}
+.btn{flex:1;height:52px;border-radius:18px;display:flex;align-items:center;justify-content:center;gap:5px;font-size:14px;font-weight:900;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+
+/* ── 八方罗盘 ── */
+.compass-wrap{margin:0 16px 6px;position:relative;height:192px;display:flex;align-items:center;justify-content:center}
+.dial{width:176px;height:176px;border-radius:50%;background:radial-gradient(circle,#FFF3CC 30%,#FFE08A 100%);position:relative;box-shadow:0 4px 16px rgba(255,179,71,.3)}
+.dial-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:44px;z-index:10}
+.cbt{position:absolute;width:46px;height:46px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .2s;z-index:20}
+.cbt:hover{transform:scale(1.15)}
+.cbt.active{box-shadow:0 0 0 3px #fff,0 0 0 5px #FFB347}
+.cic{font-size:18px;line-height:1}.clb{font-size:9px;margin-top:1px;color:#fff;font-weight:900}
+.cN {top:-23px;left:50%;transform:translateX(-50%)}
+.cNE{top:-7px;right:-20px}
+.cE {top:50%;right:-24px;transform:translateY(-50%)}
+.cSE{bottom:-7px;right:-20px}
+.cS {bottom:-23px;left:50%;transform:translateX(-50%)}
+.cSW{bottom:-7px;left:-20px}
+.cW {top:50%;left:-24px;transform:translateY(-50%)}
+.cNW{top:-7px;left:-20px}
+
+.legend{position:absolute;right:18px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:6px}
+.leg-row{display:flex;align-items:center;gap:4px}
+.leg-dot{width:10px;height:10px;border-radius:50%}
+.leg-txt{font-size:10px;color:#5A4020;font-weight:700}
+
+.thumbs8{display:flex;gap:8px;padding:0 16px;overflow-x:auto;scrollbar-width:none}
+.thumbs8::-webkit-scrollbar{display:none}
+.thumb8{flex-shrink:0;width:68px;height:76px;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.thumb8.sel{box-shadow:0 0 0 3px #AB47BC}
+.t8e{font-size:26px}.t8n{font-size:10px;font-weight:900}
+
+.desc-box{margin:8px 16px 0;background:#fff;border-radius:18px;padding:12px 14px;box-shadow:0 3px 10px rgba(0,0,0,.07)}
+.desc-ttl{font-size:14px;font-weight:900;color:#3D2C00;margin-bottom:3px}
+.desc-txt{font-size:12px;color:#7A5C30;line-height:1.6}
+
+/* ── PAGE C：多视角标注页 ── */
+.anno-hero{margin:0 16px 8px;border-radius:24px;height:186px;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.1)}
+.dot{position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;animation:dpulse 1.5s ease-in-out infinite}
+@keyframes dpulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,255,255,.6)}50%{transform:scale(1.12);box-shadow:0 0 0 8px rgba(255,255,255,0)}}
+.dlb{position:absolute;white-space:nowrap;background:rgba(61,44,0,.84);color:#fff;font-size:12px;font-weight:800;padding:3px 9px;border-radius:14px;pointer-events:none}
+.view-tabs{display:flex;gap:6px;padding:0 16px 6px;overflow-x:auto;scrollbar-width:none}
+.view-tabs::-webkit-scrollbar{display:none}
+.vtab{flex-shrink:0;padding:8px 14px;border-radius:999px;font-size:12px;font-weight:900;background:#F5EDD8;color:#A07840}
+.vtab.on{color:#fff}
+
+.parts-strip{display:flex;gap:8px;padding:0 16px 8px;overflow-x:auto;scrollbar-width:none}
+.parts-strip::-webkit-scrollbar{display:none}
+.pchip{flex-shrink:0;padding:9px 13px;border-radius:14px;background:#fff;display:flex;align-items:center;gap:6px;box-shadow:0 3px 8px rgba(0,0,0,.07)}
+.pdot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.pchip span{font-size:13px;font-weight:800;color:#3D2C00}
+
+.detail-popup{margin:0 16px;border-radius:24px;overflow:hidden;box-shadow:0 8px 24px rgba(0,0,0,.12)}
+.pop-img{width:100%;height:130px;display:flex;align-items:center;justify-content:center;font-size:64px;position:relative}
+.zoom-b{position:absolute;bottom:10px;right:12px;background:rgba(255,255,255,.9);border-radius:10px;font-size:11px;font-weight:900;color:#3D2C00;padding:3px 9px}
+.pop-body{background:#fff;padding:14px 16px}
+.pop-name{font-size:20px;font-weight:900;color:#3D2C00;margin-bottom:4px}
+.pop-tag{display:inline-block;font-size:11px;font-weight:900;padding:3px 10px;border-radius:20px;color:#fff;margin-bottom:8px}
+.pop-text{font-size:15px;line-height:1.7;color:#5A4020}
+.hi{font-weight:900;border-radius:4px;padding:0 2px}
+.audio-bar{margin:10px 0 0;background:#F5EDD8;border-radius:20px;height:7px;overflow:hidden}
+.audio-prog{height:100%;border-radius:20px;animation:prog 3s linear infinite}
+@keyframes prog{0%{width:0}100%{width:100%}}
+
+.fact3{display:flex;gap:8px;padding:10px 16px 0}
+.fc{flex:1;background:#fff;border-radius:14px;padding:10px 8px;text-align:center;box-shadow:0 3px 8px rgba(0,0,0,.07)}
+.fc .fe{font-size:22px}.fc .fl{font-size:12px;font-weight:900;color:#3D2C00;margin-top:2px}.fc .fv{font-size:10px;color:#A07840;margin-top:1px}
+
+.next{margin:10px 16px 0;height:50px;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:900;gap:6px;box-shadow:0 6px 16px rgba(0,0,0,.1)}
+
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+
+<!-- ══ PAGE A：四面图 ══ -->
+<div class="phone-wrap">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="bar"><span>9:44</span><span>🔋 97%</span></div>
+  <div class="page">
+    <div class="tag">PAGE A · 四面图</div>
+    <div class="topbar">
+      <div class="back" style="background:#FFD166">←</div>
+      <div class="title">香蕉 · 四面图</div>
+      <div class="pill" style="background:#FFB347">4VIEW</div>
+    </div>
+    <div class="tabs">
+      <div class="tab tab-on">🔲 四面图</div>
+      <div class="tab tab-off">🔮 八方图</div>
+    </div>
+
+    <!-- 主图 -->
+    <div class="hero" style="background:linear-gradient(135deg,#FFF3CC,#FFD166)">
+      <div class="hero-emoji">🍌</div>
+      <div class="view-label">📷 正面视角</div>
+      <div class="badge" style="color:#FFB347">1 / 4</div>
+    </div>
+
+    <!-- 四方向选择卡 -->
+    <div class="grid4">
+      <div class="dir sel" style="background:linear-gradient(135deg,#FFF3CC,#FFD166)">
+        <div class="dir-e">⬆️</div>
+        <div class="dir-n" style="color:#E65100">正面</div>
+        <div class="dir-s" style="color:#A07840">Front · 当前</div>
+      </div>
+      <div class="dir" style="background:linear-gradient(135deg,#E3F2FD,#90CAF9)">
+        <div class="dir-e">⬇️</div>
+        <div class="dir-n" style="color:#1565C0">背面</div>
+        <div class="dir-s" style="color:#5C8DB8">Back</div>
+      </div>
+      <div class="dir" style="background:linear-gradient(135deg,#E8F5E9,#A5D6A7)">
+        <div class="dir-e">⬅️</div>
+        <div class="dir-n" style="color:#2E7D32">左面</div>
+        <div class="dir-s" style="color:#5C9E60">Left</div>
+      </div>
+      <div class="dir" style="background:linear-gradient(135deg,#FCE4EC,#F48FB1)">
+        <div class="dir-e">➡️</div>
+        <div class="dir-n" style="color:#880E4F">右面</div>
+        <div class="dir-s" style="color:#C26080">Right</div>
+      </div>
+    </div>
+
+    <!-- 四图缩略 -->
+    <div class="sec">✨ 四面总览</div>
+    <div class="thumbs4">
+      <div class="thumb4 sel" style="background:linear-gradient(135deg,#FFF3CC,#FFD166)"><div class="t4e">🍌</div><div class="t4n" style="color:#E65100">正面</div></div>
+      <div class="thumb4" style="background:linear-gradient(135deg,#E3F2FD,#90CAF9)"><div class="t4e">🍌</div><div class="t4n" style="color:#1565C0">背面</div></div>
+      <div class="thumb4" style="background:linear-gradient(135deg,#E8F5E9,#A5D6A7)"><div class="t4e">🍌</div><div class="t4n" style="color:#2E7D32">左面</div></div>
+      <div class="thumb4" style="background:linear-gradient(135deg,#FCE4EC,#F48FB1)"><div class="t4e">🍌</div><div class="t4n" style="color:#880E4F">右面</div></div>
+    </div>
+
+    <div class="btns">
+      <div class="btn" style="background:linear-gradient(135deg,#FFD166,#FFB347);color:#3D2C00">🔊 介绍</div>
+      <div class="btn" style="background:linear-gradient(135deg,#CE93D8,#AB47BC);color:#fff">🔮 八方图</div>
+      <div class="btn" style="background:linear-gradient(135deg,#80DEEA,#26C6DA);color:#fff">🔍 部位</div>
+    </div>
+  </div>
+</div>
+<div class="phone-label">PAGE A · 四面图</div>
+</div>
+
+<!-- ══ PAGE B：八方罗盘 ══ -->
+<div class="phone-wrap">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="bar"><span>9:45</span><span>🔋 96%</span></div>
+  <div class="page">
+    <div class="tag">PAGE B · 八方罗盘</div>
+    <div class="topbar">
+      <div class="back" style="background:#CE93D8">←</div>
+      <div class="title">香蕉 · 八方图</div>
+      <div class="pill" style="background:#AB47BC">8VIEW</div>
+    </div>
+    <div class="tabs">
+      <div class="tab tab-off">🔲 四面图</div>
+      <div class="tab" style="background:#AB47BC;color:#fff;box-shadow:0 4px 12px rgba(171,71,188,.4)">🔮 八方图</div>
+    </div>
+
+    <!-- 主图 -->
+    <div class="hero" style="background:linear-gradient(135deg,#F3E5F5,#CE93D8)">
+      <div class="hero-emoji">🍌</div>
+      <div class="view-label" style="background:rgba(106,27,154,.75)">🔭 背面视角</div>
+      <div class="badge" style="color:#AB47BC">5 / 8</div>
+    </div>
+
+    <!-- 八方罗盘 -->
+    <div class="compass-wrap">
+      <div class="dial">
+        <div class="dial-center">🍌</div>
+        <div class="cbt cN"  style="background:#FF8A65"><div class="cic">🍌</div><div class="clb">正面</div></div>
+        <div class="cbt cNE" style="background:#FFA726"><div class="cic">🍌</div><div class="clb">右前</div></div>
+        <div class="cbt cE"  style="background:#66BB6A"><div class="cic">🍌</div><div class="clb">右面</div></div>
+        <div class="cbt cSE" style="background:#26C6DA"><div class="cic">🍌</div><div class="clb">右后</div></div>
+        <div class="cbt cS  active" style="background:#5C6BC0"><div class="cic">🍌</div><div class="clb">背面</div></div>
+        <div class="cbt cSW" style="background:#EC407A"><div class="cic">🍌</div><div class="clb">左后</div></div>
+        <div class="cbt cW"  style="background:#AB47BC"><div class="cic">🍌</div><div class="clb">左面</div></div>
+        <div class="cbt cNW" style="background:#8D6E63"><div class="cic">🍌</div><div class="clb">左前</div></div>
+      </div>
+      <div class="legend">
+        <div class="leg-row"><div class="leg-dot" style="background:#FF8A65"></div><div class="leg-txt">正面</div></div>
+        <div class="leg-row"><div class="leg-dot" style="background:#66BB6A"></div><div class="leg-txt">右面</div></div>
+        <div class="leg-row"><div class="leg-dot" style="background:#5C6BC0"></div><div class="leg-txt">背面</div></div>
+        <div class="leg-row"><div class="leg-dot" style="background:#AB47BC"></div><div class="leg-txt">左面</div></div>
+        <div class="leg-row"><div class="leg-dot" style="background:#FFA726"></div><div class="leg-txt">斜角×4</div></div>
+      </div>
+    </div>
+
+    <!-- 八图横滚缩略 -->
+    <div class="sec">🗂️ 八方全览 · 左右滑动</div>
+    <div class="thumbs8">
+      <div class="thumb8" style="background:linear-gradient(135deg,#FFCCBC,#FF8A65)"><div class="t8e">🍌</div><div class="t8n" style="color:#BF360C">正面</div></div>
+      <div class="thumb8" style="background:linear-gradient(135deg,#FFE0B2,#FFA726)"><div class="t8e">🍌</div><div class="t8n" style="color:#E65100">右前</div></div>
+      <div class="thumb8" style="background:linear-gradient(135deg,#DCEDC8,#66BB6A)"><div class="t8e">🍌</div><div class="t8n" style="color:#1B5E20">右面</div></div>
+      <div class="thumb8" style="background:linear-gradient(135deg,#B2EBF2,#26C6DA)"><div class="t8e">🍌</div><div class="t8n" style="color:#006064">右后</div></div>
+      <div class="thumb8 sel" style="background:linear-gradient(135deg,#E8EAF6,#5C6BC0)"><div class="t8e">🍌</div><div class="t8n" style="color:#1A237E">背面</div></div>
+      <div class="thumb8" style="background:linear-gradient(135deg,#FCE4EC,#EC407A)"><div class="t8e">🍌</div><div class="t8n" style="color:#880E4F">左后</div></div>
+      <div class="thumb8" style="background:linear-gradient(135deg,#F3E5F5,#AB47BC)"><div class="t8e">🍌</div><div class="t8n" style="color:#4A148C">左面</div></div>
+      <div class="thumb8" style="background:linear-gradient(135deg,#EFEBE9,#8D6E63)"><div class="t8e">🍌</div><div class="t8n" style="color:#3E2723">左前</div></div>
+    </div>
+
+    <!-- 当前视角描述 -->
+    <div class="desc-box">
+      <div class="desc-ttl">🔭 背面视角 · 你知道吗？</div>
+      <div class="desc-txt">从背面看香蕉，能看到它的<strong>背脊线</strong>！就像小龙虾的背一样，弯弯的很有趣哦～ 🐉</div>
+    </div>
+
+    <div class="btns">
+      <div class="btn" style="background:linear-gradient(135deg,#FFD166,#FFB347);color:#3D2C00">🔲 四面图</div>
+      <div class="btn" style="background:linear-gradient(135deg,#80DEEA,#26C6DA);color:#fff">🔊 介绍</div>
+      <div class="btn" style="background:linear-gradient(135deg,#A5D6A7,#66BB6A);color:#fff">🔍 部位</div>
+    </div>
+  </div>
+</div>
+<div class="phone-label">PAGE B · 八方罗盘</div>
+</div>
+
+<!-- ══ PAGE C：多视角 · 部位标注特写 ══ -->
+<div class="phone-wrap">
+<div class="phone">
+  <div class="notch"></div>
+  <div class="bar"><span>9:46</span><span>🔋 95%</span></div>
+  <div class="page">
+    <div class="tag">PAGE C · 视角标注 + 特写</div>
+    <div class="topbar">
+      <div class="back" style="background:#FFD166">←</div>
+      <div class="title">香蕉 · 标注特写</div>
+      <div class="pill" style="background:#FFB347">食物</div>
+    </div>
+
+    <!-- 视角切换横滚标签 -->
+    <div class="view-tabs">
+      <div class="vtab on" style="background:#FF8A65">正面</div>
+      <div class="vtab">背面</div>
+      <div class="vtab">左面</div>
+      <div class="vtab">右面</div>
+      <div class="vtab">右前</div>
+      <div class="vtab">右后</div>
+      <div class="vtab">左前</div>
+      <div class="vtab">左后</div>
+    </div>
+
+    <!-- 当前视角图 + 标注 -->
+    <div class="anno-hero" style="background:linear-gradient(135deg,#FFF3CC,#FFD166)">
+      <div style="font-size:96px;filter:drop-shadow(0 8px 16px rgba(0,0,0,.15))">🍌</div>
+      <!-- 四个标注点 -->
+      <div class="dot" style="width:40px;height:40px;background:rgba(255,179,71,.92);top:22px;left:148px">
+        <span style="font-size:11px;font-weight:900;color:#fff">皮</span>
+        <div class="dlb" style="top:44px;left:50%;transform:translateX(-50%)">香蕉皮</div>
+      </div>
+      <div class="dot" style="width:38px;height:38px;background:rgba(79,195,247,.92);top:82px;left:188px">
+        <span style="font-size:11px;font-weight:900;color:#fff">肉</span>
+        <div class="dlb" style="top:42px;left:50%;transform:translateX(-50%)">果肉</div>
+      </div>
+      <div class="dot" style="width:36px;height:36px;background:rgba(102,187,106,.92);top:138px;left:98px">
+        <span style="font-size:11px;font-weight:900;color:#fff">柄</span>
+        <div class="dlb" style="top:40px;left:50%;transform:translateX(-50%)">果柄</div>
+      </div>
+      <div class="dot" style="width:34px;height:34px;background:rgba(240,98,146,.92);top:68px;right:82px">
+        <span style="font-size:11px;font-weight:900;color:#fff">尖</span>
+        <div class="dlb" style="top:38px;left:50%;transform:translateX(-50%)">果尖</div>
+      </div>
+      <div class="badge" style="color:#FFB347">正面 · 4 处标注</div>
+    </div>
+
+    <!-- 部位横向标签 -->
+    <div class="parts-strip">
+      <div class="pchip" style="border:2px solid #FFB347"><div class="pdot" style="background:#FFB347"></div><span>🟡 香蕉皮</span></div>
+      <div class="pchip"><div class="pdot" style="background:#4FC3F7"></div><span>🍌 果肉</span></div>
+      <div class="pchip"><div class="pdot" style="background:#66BB6A"></div><span>🟢 果柄</span></div>
+      <div class="pchip"><div class="pdot" style="background:#F06292"></div><span>🔴 果尖</span></div>
+    </div>
+
+    <!-- 选中部位特写卡片（香蕉皮被点击） -->
+    <div class="sec">🔍 当前选中：香蕉皮</div>
+    <div class="detail-popup">
+      <div class="pop-img" style="background:linear-gradient(135deg,#FFF3CC,#FFD166)">
+        🍌
+        <div class="zoom-b">🔍 正面 · 皮</div>
+      </div>
+      <div class="pop-body">
+        <div class="pop-name">香蕉 · 果皮</div>
+        <div class="pop-tag" style="background:#FFB347">🍎 食物 · 外层保护</div>
+        <div class="pop-text">
+          果皮是<span class="hi" style="color:#FFB347;background:#FFF3CC">黄色</span>的，
+          要<span class="hi" style="color:#66BB6A;background:#E8F5E9">剥开</span>才能吃里面甜甜的果肉哦。
+        </div>
+        <div class="audio-bar"><div class="audio-prog" style="background:linear-gradient(90deg,#FFB347,#FFD166)"></div></div>
+      </div>
+    </div>
+
+    <div class="fact3">
+      <div class="fc"><div class="fe">🎨</div><div class="fl">颜色</div><div class="fv">黄色</div></div>
+      <div class="fc"><div class="fe">👅</div><div class="fl">口感</div><div class="fv">不直接吃</div></div>
+      <div class="fc"><div class="fe">🍽️</div><div class="fl">吃法</div><div class="fv">先剥再吃</div></div>
+    </div>
+
+    <div class="next" style="background:linear-gradient(135deg,#FFD166,#FFB347);color:#3D2C00">
+      👉 下一个部位
+    </div>
+  </div>
+</div>
+<div class="phone-label">PAGE C · 视角标注 + 特写</div>
+</div>
+
+</body>
+</html>

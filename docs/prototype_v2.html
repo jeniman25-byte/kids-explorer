@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>小探索家 — 完整原型 v3</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:#171727;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding:32px 18px 60px;
+  gap:42px;
+  flex-wrap:wrap;
+  font-family:"PingFang SC","Microsoft YaHei",sans-serif;
+}
+.phone-wrap{display:flex;flex-direction:column;align-items:center}
+.phone{
+  width:390px;height:844px;background:#FFFBF0;border-radius:54px;
+  box-shadow:0 32px 80px rgba(0,0,0,.55),0 0 0 12px #222,0 0 0 14px #555;
+  overflow:hidden;position:relative;flex-shrink:0;
+}
+.phone-label{color:#9494a5;text-align:center;margin-top:12px;font-size:12px;letter-spacing:1px}
+.notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:128px;height:34px;background:#222;border-radius:0 0 20px 20px;z-index:100}
+.statusbar{height:46px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 28px 7px;font-size:12px;font-weight:700;color:#3D2C00;position:relative;z-index:50}
+.page{width:100%;height:798px;overflow:hidden;position:relative}
+.page-tag{position:absolute;top:14px;left:16px;background:rgba(61,44,0,.12);color:#3D2C00;font-size:11px;font-weight:800;padding:4px 10px;border-radius:10px;z-index:20}
+.top-bar{display:flex;align-items:center;padding:8px 16px 6px;gap:10px}
+.back-btn{width:38px;height:38px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:18px;cursor:pointer;box-shadow:0 3px 8px rgba(0,0,0,.12)}
+.page-title{font-size:20px;font-weight:900;color:#3D2C00;flex:1;text-align:center}
+.cat-pill{font-size:11px;font-weight:900;padding:4px 10px;border-radius:20px;color:#fff}
+.section-title{padding:8px 18px 6px;font-size:15px;font-weight:900;color:#3D2C00}
+.small-sub{font-size:12px;color:#A07840;padding:0 18px 8px}
+.card{background:#fff;border-radius:20px;box-shadow:0 4px 12px rgba(0,0,0,.08)}
+
+/* 首页通用 */
+.home-header{text-align:center;padding:14px 0 4px}
+.app-name{font-size:24px;font-weight:900;color:#3D2C00}
+.app-sub{font-size:13px;color:#A07840;margin-top:2px}
+.cat-label{padding:8px 18px 6px;font-size:15px;font-weight:900;color:#3D2C00}
+.cat-row{display:flex;gap:10px;padding:0 16px 10px}
+.cat-card{flex:1;height:92px;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:pointer;transition:transform .15s;position:relative;overflow:hidden}
+.cat-card:hover{transform:scale(.97)}
+.cat-card.active{box-shadow:0 0 0 3px #fff,0 0 0 5px currentColor}
+.cat-emoji{font-size:32px}.cat-name{font-size:13px;font-weight:900}.cat-count{font-size:11px;opacity:.76}.cat-badge{position:absolute;top:6px;right:8px;width:8px;height:8px;border-radius:50%;background:#fff;display:none}.cat-card.active .cat-badge{display:block}
+.hint-wrap{text-align:center;padding:0 24px 10px}.hint-main{font-size:20px;font-weight:900;color:#3D2C00;line-height:1.5}.hint-sub{font-size:13px;color:#A07840;margin-top:4px}
+.mic-area{display:flex;flex-direction:column;align-items:center;margin-bottom:12px}.mic-rings{position:relative;width:164px;height:164px;display:flex;align-items:center;justify-content:center}.ring{position:absolute;border-radius:50%;border:3px solid;animation:pulse 2s ease-out infinite}.r1{width:164px;height:164px;opacity:.18}.r2{width:132px;height:132px;opacity:.28;animation-delay:.35s}.r3{width:104px;height:104px;opacity:.38;animation-delay:.7s}
+@keyframes pulse{0%{transform:scale(.9);opacity:.38}70%{transform:scale(1.12);opacity:0}100%{transform:scale(.9);opacity:0}}
+.mic-btn{width:98px;height:98px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:41px;position:relative;z-index:2;box-shadow:0 8px 24px rgba(0,0,0,.18)}
+.mic-hint{font-size:13px;color:#A07840;margin-top:8px;font-weight:700}
+.quick-row{display:flex;gap:10px;padding:0 16px 10px}.quick-card{flex:1;height:74px;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}.quick-card .q1{font-size:24px}.quick-card .q2{font-size:12px;font-weight:800;color:#3D2C00}.quick-card .q3{font-size:10px;color:#A07840}
+.history-scroll{display:flex;gap:10px;padding:0 16px;overflow-x:auto;scrollbar-width:none}.history-scroll::-webkit-scrollbar{display:none}.h-card{flex-shrink:0;width:76px;height:84px;border-radius:18px;background:#fff;box-shadow:0 3px 10px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}.h-emoji{font-size:30px}.h-name{font-size:11px;font-weight:800;color:#3D2C00}.h-tag{font-size:9px;font-weight:900;padding:2px 6px;border-radius:8px;color:#fff}
+.guide-box{margin:12px 16px 0;border-radius:20px;padding:14px 16px;text-align:center}.guide-box .g1{font-size:24px;margin-bottom:4px}.guide-box .g2{font-size:15px;font-weight:900;color:#3D2C00}.guide-box .g3{font-size:12px;color:#A07840;margin-top:3px;line-height:1.6}
+
+/* 探索页 */
+.hero-wrap{margin:0 16px 8px;border-radius:24px;height:228px;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 20px rgba(0,0,0,.12)}
+.hero-emoji{font-size:118px;filter:drop-shadow(0 8px 16px rgba(0,0,0,.15))}
+.dot{position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10;animation:dotpulse 1.5s ease-in-out infinite}
+@keyframes dotpulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(255,255,255,.6)}50%{transform:scale(1.12);box-shadow:0 0 0 8px rgba(255,255,255,0)}}
+.dot-label{position:absolute;white-space:nowrap;background:rgba(61,44,0,.84);color:#fff;font-size:12px;font-weight:800;padding:4px 9px;border-radius:16px;pointer-events:none}
+.parts-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px}.part-chip{background:#fff;border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:7px;box-shadow:0 3px 8px rgba(0,0,0,.07)}.dot-s{width:12px;height:12px;border-radius:50%;flex-shrink:0}.part-chip span{font-size:13px;font-weight:800;color:#3D2C00}
+.info-row{display:flex;gap:8px;padding:10px 16px 0}.info-mini{flex:1;padding:12px 10px;text-align:center;border-radius:16px;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.07)}.info-mini .i1{font-size:24px}.info-mini .i2{font-size:12px;font-weight:900;color:#3D2C00;margin-top:2px}.info-mini .i3{font-size:10px;color:#A07840;margin-top:2px}
+.action-bar{display:flex;gap:10px;padding:10px 16px 0}.ab{flex:1;height:52px;border-radius:18px;display:flex;align-items:center;justify-content:center;gap:5px;font-size:14px;font-weight:900;box-shadow:0 4px 12px rgba(0,0,0,.1)}
+
+/* 特写页 */
+.detail-card{margin:8px 16px;border-radius:26px;overflow:hidden;box-shadow:0 8px 28px rgba(0,0,0,.12)}
+.detail-img{width:100%;height:194px;display:flex;align-items:center;justify-content:center;font-size:82px;position:relative}.zoom-badge{position:absolute;bottom:10px;right:12px;background:rgba(255,255,255,.9);border-radius:10px;font-size:11px;font-weight:900;color:#3D2C00;padding:4px 9px}
+.detail-body{background:#fff;padding:16px 18px}.detail-name{font-size:26px;font-weight:900;color:#3D2C00;margin-bottom:6px}.detail-tag{display:inline-block;font-size:12px;font-weight:900;padding:4px 10px;border-radius:20px;color:#fff;margin-bottom:10px}.karaoke{font-size:17px;line-height:1.8;color:#5A4020}.hi{font-weight:900;border-radius:4px;padding:0 2px}.audio-bar{margin:12px 0 0;background:#F5EDD8;border-radius:20px;height:7px;overflow:hidden}.audio-prog{height:100%;border-radius:20px;animation:prog 3s linear infinite}@keyframes prog{0%{width:0%}100%{width:100%}}
+.fact-cards{display:flex;gap:8px;padding:10px 16px 0}.fact-card{flex:1;background:#fff;border-radius:16px;padding:12px 10px;text-align:center;box-shadow:0 3px 8px rgba(0,0,0,.07)}.fe{font-size:26px;margin-bottom:3px}.fl{font-size:13px;font-weight:900;color:#3D2C00}.fv{font-size:11px;color:#A07840;margin-top:2px}.next-btn{margin:10px 16px 0;height:52px;border-radius:20px;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;gap:6px;box-shadow:0 6px 18px rgba(0,0,0,.12)}
+.related-list{display:flex;gap:8px;padding:10px 16px 0;overflow-x:auto;scrollbar-width:none}.related-list::-webkit-scrollbar{display:none}.related-item{flex-shrink:0;width:88px;height:88px;border-radius:18px;background:#fff;box-shadow:0 3px 8px rgba(0,0,0,.07);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}.related-item .r1{font-size:30px}.related-item .r2{font-size:11px;font-weight:800;color:#3D2C00}.related-item .r3{font-size:9px;color:#A07840}
+
+/* 列表页 */
+.search-bar{margin:0 16px 10px;height:44px;border-radius:16px;background:#fff;display:flex;align-items:center;padding:0 14px;gap:8px;box-shadow:0 3px 8px rgba(0,0,0,.07)}
+.search-bar .s1{font-size:16px}.search-bar .s2{font-size:13px;color:#A07840}
+.filter-row{display:flex;gap:8px;padding:0 16px 10px;overflow-x:auto;scrollbar-width:none}.filter-row::-webkit-scrollbar{display:none}.filter-chip{flex-shrink:0;padding:8px 12px;border-radius:999px;font-size:12px;font-weight:900;background:#fff;color:#7A5C30;box-shadow:0 3px 8px rgba(0,0,0,.06)}.filter-chip.active{color:#fff}
+.grid-list{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px}.list-card{height:134px;border-radius:20px;padding:12px;position:relative;box-shadow:0 4px 12px rgba(0,0,0,.08)}.list-card .lc1{font-size:46px}.list-card .lc2{font-size:15px;font-weight:900;color:#3D2C00;margin-top:4px}.list-card .lc3{font-size:11px;color:#7A5C30;margin-top:2px}.list-card .lc4{position:absolute;right:10px;bottom:10px;font-size:10px;font-weight:900;padding:3px 8px;border-radius:20px;background:rgba(255,255,255,.85);color:#3D2C00}
+
+/* 生成页 */
+.step-list{display:flex;flex-direction:column;gap:8px;padding:0 16px}.step-card{background:#fff;border-radius:18px;padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:0 3px 10px rgba(0,0,0,.07)}.step-icon{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px}.step-main{font-size:14px;font-weight:900;color:#3D2C00}.step-sub{font-size:12px;font-weight:700;margin-top:2px}.step-time{margin-left:auto;font-size:12px;color:#aaa}.progress{margin:0 16px;background:#F5EDD8;border-radius:20px;height:10px;overflow:hidden}.bar{height:100%;background:linear-gradient(90deg,#FFB347,#FFD166);border-radius:20px;animation:baranim 2s ease-in-out infinite alternate}@keyframes baranim{from{width:36%}to{width:78%}}
+.loading-card{margin:14px 16px 0;border-radius:22px;padding:16px;text-align:center}.loading-card .l1{font-size:30px;margin-bottom:6px}.loading-card .l2{font-size:16px;font-weight:900;color:#3D2C00}.loading-card .l3{font-size:13px;color:#A07840;line-height:1.6;margin-top:4px}
+.preview-row{display:flex;gap:8px;padding:12px 16px 0}.preview-mini{flex:1;height:76px;border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:#3D2C00}.preview-mini .pm1{font-size:26px}.preview-mini .pm2{font-size:11px;font-weight:900}.preview-mini .pm3{font-size:9px;opacity:.8}
+
+</style>
+</head>
+<body>
+
+<!-- 1 首页总览 -->
+<div class="phone-wrap">
+<div class="phone">
+<div class="notch"></div>
+<div class="statusbar"><span>9:41</span><span>🔋 100%</span></div>
+<div class="page" style="background:linear-gradient(160deg,#FFF8E7 0%,#F0F9FF 50%,#FDF2F8 100%)">
+  <div class="page-tag">页面 1 · 首页总览</div>
+  <div class="home-header"><div class="app-name">🔭 小探索家</div><div class="app-sub">探索食物 · 动物 · 花草</div></div>
+  <div class="cat-label">选择探索类型 ✨</div>
+  <div class="cat-row">
+    <div class="cat-card active" style="background:linear-gradient(135deg,#FFF3CC,#FFD166);color:#E65100"><div class="cat-badge"></div><div class="cat-emoji">🍎</div><div class="cat-name" style="color:#E65100">食物</div><div class="cat-count" style="color:#E65100">12 个</div></div>
+    <div class="cat-card" style="background:linear-gradient(135deg,#E8F5E9,#A5D6A7);color:#2E7D32"><div class="cat-emoji">🐼</div><div class="cat-name" style="color:#2E7D32">动物</div><div class="cat-count" style="color:#2E7D32">8 个</div></div>
+    <div class="cat-card" style="background:linear-gradient(135deg,#FCE4EC,#F48FB1);color:#880E4F"><div class="cat-emoji">🌸</div><div class="cat-name" style="color:#880E4F">花草</div><div class="cat-count" style="color:#880E4F">5 个</div></div>
+  </div>
+  <div class="hint-wrap"><div class="hint-main">按住说话，认识一个新朋友吧</div><div class="hint-sub">可以说“香蕉长什么样”“熊猫长什么样”“樱花长什么样”</div></div>
+  <div class="mic-area">
+    <div class="mic-rings"><div class="ring r1" style="border-color:#FFB347"></div><div class="ring r2" style="border-color:#4FC3F7"></div><div class="ring r3" style="border-color:#EC407A"></div><div class="mic-btn" style="background:linear-gradient(145deg,#FFD166,#FFB347)">🎙️</div></div>
+    <div class="mic-hint">按住说话</div>
+  </div>
+  <div class="quick-row">
+    <div class="quick-card card"><div class="q1">🧠</div><div class="q2">会拆解部位</div><div class="q3">耳朵、叶子、果皮</div></div>
+    <div class="quick-card card"><div class="q1">🔮</div><div class="q2">多角度观察</div><div class="q3">四面图 / 八方图</div></div>
+    <div class="quick-card card"><div class="q1">🔊</div><div class="q2">语音讲解</div><div class="q3">边看边听更好懂</div></div>
+  </div>
+  <div class="section-title">最近探索 👀</div>
+  <div class="history-scroll">
+    <div class="h-card"><div class="h-emoji">🍌</div><div class="h-name">香蕉</div><div class="h-tag" style="background:#FFB347">食物</div></div>
+    <div class="h-card"><div class="h-emoji">🐼</div><div class="h-name">熊猫</div><div class="h-tag" style="background:#66BB6A">动物</div></div>
+    <div class="h-card"><div class="h-emoji">🌸</div><div class="h-name">樱花</div><div class="h-tag" style="background:#EC407A">花草</div></div>
+    <div class="h-card"><div class="h-emoji">🍎</div><div class="h-name">苹果</div><div class="h-tag" style="background:#FFB347">食物</div></div>
+    <div class="h-card"><div class="h-emoji">🦁</div><div class="h-name">狮子</div><div class="h-tag" style="background:#66BB6A">动物</div></div>
+  </div>
+  <div class="guide-box" style="background:linear-gradient(135deg,#FFF3CC,#FFE8A3)"><div class="g1">✨</div><div class="g2">今天来认识新东西</div><div class="g3">你可以先从最熟悉的食物开始，<br>再去看看可爱的动物和漂亮的花草。</div></div>
+</div>
+</div>
+<div class="phone-label">PAGE 1 · 首页总览</div>
+</div>
+
+<!-- 2 食物首页 -->
+<div class="phone-wrap">
+<div class="phone">
+<div class="notch"></div>
+<div class="statusbar"><span>9:42</span><span>🔋 99%</span></div>
+<div class="page" style="background:linear-gradient(160deg,#FFF8E7,#FFF1CC,#FFE0A3)">
+  <div class="page-tag">页面 2 · 食物首页</div>
+  <div class="home-header"><div class="app-name">🍎 食物探索</div><div class="app-sub">看看能吃的东西都长什么样</div></div>
+  <div class="cat-label">当前分类</div>
+  <div class="cat-row">
+    <div class="cat-card active" style="background:linear-gradient(135deg,#FFF3CC,#FFD166);color:#E65100"><div class="cat-badge"></div><div class="cat-emoji">🍎</div><div class="cat-name" style="color:#E65100">食物</div><div class="cat-count" style="color:#E65100">当前模式</div></div>
+    <div class="cat-card" style="background:linear-gradient(135deg,#E8F5E9,#A5D6A7);opacity:.6;color:#2E7D32"><div class="cat-emoji">🐼</div><div class="cat-name" style="color:#2E7D32">动物</div><div class="cat-count" style="color:#2E7D32">切换</div></div>
+    <div class="cat-card" style="background:linear-gradient(135deg,#FCE4EC,#F48FB1);opacity:.6;color:#880E4F"><div class="cat-emoji">🌸</div><div class="cat-name" style="color:#880E4F">花草</div><div class="cat-count" style="color:#880E4F">切换</div></div>
+  </div>
+  <div class="hint-wrap"><div class="hint-main">说出你想认识的食物吧！🍌</div><div class="hint-sub">试试说“香蕉长什么样”</div></div>
+  <div class="mic-area"><div class="mic-rings"><div class="ring r1" style="border-color:#FFB347"></div><div class="ring r2" style="border-color:#FFB347"></div><div class="ring r3" style="border-color:#FFB347"></div><div class="mic-btn" style="background:linear-gradient(145deg,#FFD166,#FFB347);box-shadow:0 8px 24px rgba(255,179,71,.52)">🎙️</div></div><div class="mic-hint">按住说出食物名称</div></div>
+  <div class="section-title">推荐食物</div>
+  <div class="quick-row">
+    <div class="quick-card card"><div class="q1">🍌</div><div class="q2">香蕉</div><div class="q3">看看果皮和果肉</div></div>
+    <div class="quick-card card"><div class="q1">🍉</div><div class="q2">西瓜</div><div class="q3">看看瓜皮和籽</div></div>
+    <div class="quick-card card"><div class="q1">🥕</div><div class="q2">胡萝卜</div><div class="q3">看看根部和叶子</div></div>
+  </div>
+  <div class="section-title">最近探索 🍽️</div>
+  <div class="history-scroll">
+    <div class="h-card"><div class="h-emoji">🍌</div><div class="h-name">香蕉</div><div class="h-tag" style="background:#FFB347">食物</div></div>
+    <div class="h-card"><div class="h-emoji">🍓</div><div class="h-name">草莓</div><div class="h-tag" style="background:#FFB347">食物</div></div>
+    <div class="h-card"><div class="h-emoji">🍍</div><div class="h-name">菠萝</div><div class="h-tag" style="background:#FFB347">食物</div></div>
+    <div class="h-card"><div class="h-emoji">🍊</div><div class="h-name">橙子</div><div class="h-tag" style="background:#FFB347">食物</div></div>
+  </div>
+  <div class="guide-box" style="background:linear-gradient(135deg,#FFF3CC,#FFD166)"><div class="g1">🍽️</div><div class="g2">食物探索重点</div><div class="g3">更适合展示颜色、口感、能不能吃、<br>有没有果皮、果核、叶子这些结构。</div></div>
+</div>
+</div>
+<div class="phone-label">PAGE 2 · 食物首页</div>
+</div>
+
+<!-- 3 动物首页 -->
+<div class="phone-wrap">
+<div class="phone">
+<div class="notch"></div>
+<div class="statusbar"><span>9:43</span><span>🔋 98%</span></div>
+<div class="page" style="background:linear-gradient(160deg,#F1FFF1,#E8F5E9,#DCEDC8)">
+  <div class="page-tag">页面 3 · 动物首页</div>
+  <div class="home-header"><div class="app-name">🐼 动物探索</div><div class="app-sub">观察耳朵、眼睛、尾巴和爪子</div></div>
+  <div class="cat-label">当前分类</div>
+  <div class="cat-row">
+    <div class="cat-card" style="background:linear-gradient(135deg,#FFF3CC,#FFD166);opacity:.6;color:#E65100"><div class="cat-emoji">🍎</div><div class="cat-name" style="color:#E65100">食物</div><div class="cat-count" style="color:#E65100">切换</div></div>
+    <div class="cat-card active" style="background:linear-gradient(135deg,#E8F5E9,#A5D6A7);color:#2E7D32"><div class="cat-badge"></div><div class="cat-emoji">🐼</div><div class="cat-name" style="color:#2E7D32">动物</div><div class="cat-count" style="color:#2E7D32">当前模式</div></div>
+    <div class="cat-card" style="background:linear-gradient(135deg,#FCE4EC,#F48FB1);opacity:.6;color:#880E4F"><div class="cat-emoji">🌸</div><div class="cat-name" style="color:#880E4F">花草</div><div class="cat-count" style="color:#880E4F">切换</div></div>
+  </div>
+  <div class="hint-wrap"><div class="hint-main">说出你想认识的动物吧！🐯</div><div class="hint-sub">试试说“熊猫长什么样”</div></div>
+  <div class="mic-area"><div class="mic-rings"><div class="ring r1" style="border-color:#66BB6A"></div><div class="ring r2" style="border-color:#66BB6A"></div><div class="ring r3" style="border-color:#66BB6A"></div><div class="mic-btn" style="background:linear-gradient(145deg,#A5D6A7,#66BB6A);box-shadow:0 8px 24px rgba(102,187,106,.5)">🎙️</div></div><div class="mic-hint">按住说出动物名称</div></div>
+  <div class="section-title">推荐动物</div>
+  <div class="quick-row">
+    <div class="quick-card card"><div class="q1">🐼</div><div class="q2">熊猫</div><div class="q3">看黑眼圈和爪子</div></div>
+    <div class="quick-card card"><div class="q1">🦁</div><div class="q2">狮子</div><div class="q3">看鬃毛和尾巴</div></div>
+    <div class="quick-card card"><div class="q1">🦋</div><div class="q2">蝴蝶</div><div class="q3">看翅膀花纹</div></div>
+  </div>
+  <div class="section-title">最近探索 🐾</div>
+  <div class="history-scroll">
+    <div class="h-card"><div class="h-emoji">🐼</div><div class="h-name">熊猫</div><div class="h-tag" style="background:#66BB6A">动物</div></div>
+    <div class="h-card"><div class="h-emoji">🐘</div><div class="h-name">大象</div><div class="h-tag" style="background:#66BB6A">动物</div></div>
+    <div class="h-card"><div class="h-emoji">🐬</div><div class="h-name">海豚</div><div class="h-tag" style="background:#66BB6A">动物</div></div>
+    <div class="h-card"><div class="h-emoji">🦒</div><div class="h-name">长颈鹿</div><div class="h-tag" style="background:#66BB6A">动物</div></div>
+  </div>
+  <div class="guide-box" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9)"><div class="g1">🐾</div><div class="g2">动物探索重点</div><div class="g3">更适合展示耳朵、眼睛、嘴巴、翅膀、<br>尾巴、花纹，还有习性小知识。</div></div>
+</div>
+</div>
+<div class="phone-label">PAGE 3 · 动物首页</div>
+</div>
+
+<!-- 4 花草首页 -->
+<div class="phone-wrap">
+<div class="phone">
+<div class="notch"></div>
+<div class="statusbar"><span>9:44</span><span>🔋 97%</span></div>
+<div class="page" style="background:linear-gradient(160deg,#FFF0F5,#FCE4EC,#F8BBD0)">
+  <div class="page-tag">页面 4 · 花草首页</div>
+  <div class="home-header"><div class="app-name">🌸 花草探索</div><div class="app-sub">看看花瓣、叶子、茎和种子</div></div>
+  <div class="cat-label">当前分类</div>
+  <div class="cat-row">
+    <div class="cat-card" style="background:linear-gradient(135deg,#FFF3CC,#FFD166);opacity:.6;color:#E65100"><div class="cat-emoji">🍎</div><div class="cat-name" style="color:#E65100">食物</div><div class="cat-count" style="color:#E65100">切换</div></div>
+    <div class="cat-card" style="background:linear-gradient(135deg,#E8F5E9,#A5D6A7);opacity:.6;color:#2E7D32"><div class="cat-emoji">🐼</div><div class="cat-name" style="color:#2E7D32">动物</div><div class="cat-count" style="color:#2E7D32">切换</div></div>
+    <div class="cat-card active" style="background:linear-gradient(135deg,#FCE4EC,#F48FB1);color:#880E4F"><div class="cat-badge"></div><div class="cat-emoji">🌸</div><div class="cat-name" style="color:#880E4F">花草</div><div class="cat-count" style="color:#880E4F">当前模式</div></div>
+  </div>
+  <div class="hint-wrap"><div class="hint-main">说出你想认识的花草吧！🌻</div><div class="hint-sub">试试说“樱花长什么样”</div></div>
+  <div class="mic-area"><div class="mic-rings"><div class="ring r1" style="border-color:#EC407A"></div><div class="ring r2" style="border-color:#EC407A"></div><div class="ring r3" style="border-color:#EC407A"></div><div class="mic-btn" style="background:linear-gradient(145deg,#F48FB1,#EC407A);box-shadow:0 8px 24px rgba(236,64,122,.45)">🎙️</div></div><div class="mic-hint">按住说出花草名称</div></div>
+  <div class="section-title">推荐花草</div>
+  <div class="quick-row">
+    <div class="quick-card card"><div class="q1">🌸</div><div class="q2">樱花</div><div class="q3">看花瓣和花蕊</div></div>
+    <div class="quick-card card"><div class="q1">🌻</div><div class="q2">向日葵</div><div class="q3">看花盘和种子</div></div>
+    <div class="quick-card card"><div class="q1">🎍</div><div class="q2">竹子</div><div class="q3">看竹节和叶片</div></div>
+  </div>
+  <div class="section-title">最近探索 🌿</div>
+  <div class="history-scroll">
+    <div class="h-card"><div class="h-emoji">🌸</div><div class="h-name">樱花</div><div class="h-tag" style="background:#EC407A">花草</div></div>
+    <div class="h-card"><div class="h-emoji">🌻</div><div class="h-name">向日葵</div><div class="h-tag" style="background:#EC407A">花草</div></div>
+    <div class="h-card"><div class="h-emoji">🍀</div><div class="h-name">四叶草</div><div class="h-tag" style="background:#EC407A">花草</div></div>
+    <div class="h-card"><div class="h-emoji">🌹</div><div class="h-name">玫瑰</div><div class="h-tag" style="background:#EC407A">花草</div></div>
+  </div>
+  <div class="guide-box" style="background:linear-gradient(135deg,#FCE4EC,#F8BBD0)"><div class="g1">🌿</div><div class="g2">花草探索重点</div><div class="g3">更适合展示花瓣、叶子、花蕊、枝干、<br>果实、香味和季节特点。</div></div>
+</div>
+</div>
+<div class="phone-label">PAGE 4 · 花草首页</div>
+</div>
+
+<!-- 5 生成中页面 -->
+<div class="phone-wrap">
+<div class="phone">
+<div class="notch"></div>
+<div class="statusbar"><span>9:45</span><span>🔋 96%</span></div>
+<div class="page" style="background:#FFFBF0">
+  <div class="page-tag">页面 5 · 生成中</div>
+  <div class="top-bar"><div class="back-btn" style="background:#FFD166">←</div><div class="page-title">正在生成中…</div><div class="cat-pill" style="background:#66BB6A">AI✨</div></div>
+  <div class="small-sub">听到你说“熊猫长什么样”啦，正在帮你画图和拆解部位。</div>
+  <div class="step-list">
+    <div class="step-card"><div class="step-icon" style="background:#E8F5E9">✅</div><div><div class="step-main">识别关键词</div><div class="step-sub" style="color:#66BB6A">已识别：熊猫 / animal</div></div><div class="step-time">0.4s</div></div>
+    <div class="step-card"><div class="step-icon" style="background:#E3F2FD">✅</div><div><div class="step-main">生成正面图</div><div class="step-sub" style="color:#4FC3F7">正面插画完成</div></div><div class="step-time">2.1s</div></div>
+    <div class="step-card" style="background:#FFF8E7;border:2px solid #FFD166"><div class="step-icon" style="background:#FFF3CC">⚙️</div><div><div class="step-main">生成四面图（2/4）</div><div class="step-sub" style="color:#FFB347">正在生成左面、右面…</div></div><div class="step-time" style="color:#FFB347;font-weight:900">50%</div></div>
+    <div class="step-card" style="opacity:.5"><div class="step-icon" style="background:#F3E5F5">⏳</div><div><div class="step-main">生成八方图</div><div class="step-sub" style="color:#bbb">等待四面图完成…</div></div></div>
+    <div class="step-card" style="opacity:.5"><div class="step-icon" style="background:#FCE4EC">⏳</div><div><div class="step-main">图像拆解标注</div><div class="step-sub" style="color:#bbb">等待全部图完成…</div></div></div>
+  </div>
+  <div class="progress"><div class="bar"></div></div>
+  <div class="preview-row">
+    <div class="preview-mini" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9)"><div class="pm1">🐼</div><div class="pm2">正面</div><div class="pm3">已完成</div></div>
+    <div class="preview-mini" style="background:linear-gradient(135deg,#E3F2FD,#BBDEFB)"><div class="pm1">🐼</div><div class="pm2">背面</div><div class="pm3">已完成</div></div>
+    <div class="preview-mini" style="background:linear-gradient(135deg,#FFF8E7,#FFE8A3)"><div class="pm1">✨</div><div class="pm2">左面</div><div class="pm3">生成中</div></div>
+    <div class="preview-mini" style="background:linear-gradient(135deg,#FFF8E7,#FFE8A3)"><div class="pm1">✨</div><div class="pm2">右面</div><div class="pm3">生成中</div></div>
+  </div>
+  <div class="loading-card" style="background:linear-gradient(135deg,#FFF3CC,#FFE08A)"><div class="l1">🎨</div><div class="l2">AI 小画家正在努力工作～</div><div class="l3">先把熊猫的四个方向画出来，<br>再继续补齐八个方向和身体部位。</div></div>
+</div>
+</div>
+<div class="phone-label">PAGE 5 · 生成中</div>
+</div>
+
+<!-- 6 食物探索页 -->
+<div class="phone-wrap">
+<div class="phone">
+<div class="notch"></div>
+<div class="statusbar"><span>9:46</span><span>🔋 95%</span></div>
+<div class="page" style="background:#FFFBF0">
+  <div class="page-tag">页面 6 · 食物探索页</div>
+  <div class="top-bar"><div class="back-btn" style="background:#FFD166">←</div><div class="page-title">香蕉 🍌</div><div class="cat-pill" style="background:#FFB347">食物</div></div>
+  <div class="hero-wrap" style="background:linear-gradient(135deg,#FFF3CC,#FFD166)">
+    <div class="hero-emoji">🍌</div>
+    <div class="dot" style="width:40px;height:40px;background:rgba(255,179,71,.92);top:26px;left:156px"><span style="font-size:11px;font-weight:900;color:#fff">皮</span><div class="dot-label" style="top:44px;left:50%;transform:translateX(-50%)">香蕉皮</div></div>
+    <div class="dot" style="width:40px;height:40px;background:rgba(79,195,247,.92);top:94px;left:196px"><span style="font-size:11px;font-weight:900;color:#fff">肉</span><div class="dot-label" style="top:44px;left:50%;transform:translateX(-50%)">果肉</div></div>
+    <div class="dot" style="width:38px;height:38px;background:rgba(102,187,106,.92);top:170px;left:104px"><span style="font-size:11px;font-weight:900;color:#fff">柄</span><div class="dot-label" style="top:42px;left:50%;transform:translateX(-50%)">果柄</div></div>
+    <div class="dot" style="width:36px;height:36px;background:rgba(240,98,146,.92);top:78px;right:82px"><span style="font-size:11px;font-weight:900;color:#fff">尖</span><div class="dot-label" style="top:40px;left:50%;transform:translateX(-50%)">果尖</div></div>
+  </div>
+  <div class="section-title">点击部位了解更多</div>
+  <div class="parts-grid">
+    <div class="part-chip"><div class="dot-s" style="background:#FFB347"></div><span>🟡 香蕉皮</span></div>
+    <div class="part-chip"><div class="dot-s" style="background:#4FC3F7"></div><span>🍌 果肉</span></div>
+    <div class="part-chip"><div class="dot-s" style="background:#66BB6A"></div><span>🟢 果柄</span></div>
+    <div class="part-chip"><div class="dot-s" style="background:#F06292"></div><span>🔴 果尖</span></div>
+  </div>
+  <div class="info-row">
+    <div class="info-mini"><div class="i1">🎨</div><div class="i2">颜色</div><div class="i3">黄色</div></div>
+    <div class="info-mini"><div class="i1">👅</div><div class="i2">口感</div><div class="i3">软软甜甜</div></div>
+    <div class="info-mini"><div class="i1">🍽️</div><div class="i2">吃法</div><div class="i3">剥皮后吃</div></div>
+  </div>
+  <div class="action-bar">
+    <div class="ab" style="background:linear-gradient(135deg,#FFD166,#FFB347);color:#3D2C00">🔊 介绍</div>
+    <div class="ab" style="background:linear-gradient(135deg,#81D4FA,#4FC3F7);color:#fff">🔄 再来</div>
+    <div class="ab" style="background:linear-gradient(135deg,#CE93D8,#AB47BC);color:#fff">🔮 多角度</div>
+  </div>
+</div>
+</div>
+<div class="phone-label">PAGE 6 · 食物探索页</div>
+</div>
+
+<!-- 7 动物探索页 -->
+<div class="phone-wrap">
+<div class="phone">
+<div class="notch"></div>
+<div class="statusbar"><span>9:47</span><span>🔋 94%</span></div>
+<div class="page" style="background:#FFFBF0">
+  <div class="page-tag">页面 7 · 动物探索页</div>
+  <div class="top-bar"><div class="back-btn" style="background:#A5D6A7">←</div><div class="page-title">熊猫 🐼</div><div class="cat-pill" style="background:#66BB6A">动物</div></div>
+  <div class="hero-wrap" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9)">
+    <div class="hero-emoji">🐼</div>
+    <div class="dot" style="width:40px;height:40px;background:rgba(102,187,106,.92);top:30px;left:132px"><span style="font-size:11px;font-weight:900;color:#fff">耳</span><div class="dot-label" style="top:44px;left:50%;transform:translateX(-50%)">黑耳朵</div></div>
+    <div class="dot" style="width:40px;height:40px;background:rgba(79,195,247,.92);top:84px;left:168px"><span style="font-size:11px;font-weight:900;color:#fff">眼</span><div class="dot-label" style="top:44px;left:50%;transform:translateX(-50%)">黑眼圈</div></div>
+    <div class="dot" style="width:38px;height:38px;background:rgba(255,179,71,.92);top:150px;left:110px"><span style="font-size:11px;font-weight:900;color:#fff">爪</span><div class="dot-label" style="top:42px;left:50%;transform:translateX(-50%)">熊爪</div></div>
+    <div class="dot" style="width:36px;height:36px;background:rgba(240,98,146,.92);top:148px;right:88px"><span style="font-size:11px;font-weight:900;color:#fff">尾</span><div class="dot-label" style="top:40px;left:50%;transform:translateX(-50%)">短尾巴</div></div>
+  </div>
+  <div class="section-title">点击部位了解更多</div>
+  <div class="parts-grid">
+    <div class="part-chip"><div class="dot-s" style="background:#66BB6A"></div><span>🖤 黑耳朵</span></div>
+    <div class="part-chip"><div class="dot-s" style="background:#4FC3F7"></div><span>👀 黑眼圈</span></div>
+    <div class="part-chip"><div class="dot-s" style="background:#FFB347"></div><span>🐾 熊爪</span></div>
+    <div class="part-chip"><div class="dot-s" style="background:#F06292"></div><span>🔘 短尾巴</span></div>
+  </div>
+  <div class="info-row">
+    <div class="info-mini"><div class="i1">🎨</div><div class="i2">颜色</div><div class="i3">黑白相间</div></div>
+    <div class="info-mini"><div class="i1">🐾</div><div class="i2">习性</div><div class="i3">爱吃竹子</div></div>
+    <div class="info-mini"><div class="i1">💡</div><div class="i2">趣味</div><div class="i3">眼圈都不同</div></div>
+  </div>
+  <div class="action-bar">
+    <div class="ab" style="background:linear-gradient(135deg,#A5D6A7,#66BB6A);color:#fff">🔊 介绍</div>
+    <div class="ab" style="background:linear-gradient(135deg,#81D4FA,#4FC3F7);color:#fff">🔄 再来</div>
+    <div class="ab" style="background:linear-gradient(135deg,#CE93D8,#AB47BC);color:#fff">🔮 多角度</div>
+  </div>
+</div>
+</div>
+<div class="phone-label">PAGE 7 · 动物探索页</div>
+</div>
+
+<!-- 8 花草探索页 -->
+<div class="phone-wrap">
+<div class="phone">
+<div class="notch"></div>
+<div class="statusbar"><span>9:48</span><span>🔋 93%</span></div>
+<div class="page" style="background:#FFFBF0">
+  <div class="page-tag">页面 8 · 花草探索页</div>
+  <div class="top-bar"><div class="back-btn" style="background:#F48FB1">←</div><div class="page-title">樱花 🌸</div><div class="cat-pill" style="background:#EC407A">花草</div></div>
+  <div class="hero-wrap" style="background:linear-gradient(135deg,#FCE4EC,#F8BBD0)">
+    <div class="hero-emoji">🌸</div>
+    <div class="dot" style="width:40px;height:40px;background:rgba(236,64,122,.92);top:30px;left:156px"><span style="font-size:11px;font-weight:900;color:#fff">瓣</span><div class="dot-label" style="top:44px;left:50%;transform:translateX(-50%)">花瓣</div></div>
+    <div class="dot" style="width:38px;height:38px;background:rgba(255,179,71,.92);top:92px;left:196px"><span style="font-size:11px;font-weight:900;color:#fff">蕊</span><div class="dot-label" style="top:42px;left:50%;transform:translateX(-50%)">花蕊</div></div>
+    <div class="dot" style="width:38px;height:38px;background:rgba(102,187,106,.92);top:172px;left:108px"><span style="font-size:11px;font-weight:900;color:#fff">叶</span><div class="dot-label" style="top:42px;left:50%;transform:translateX(-50%)">叶子</div></div>
+    <div class="dot" style="width:36px;height:36px;background:rgba(79,195,247,.92);top:154px;right:88px"><span style="font-size:11px;font-weight:900;color:#fff">枝</span><div class="dot-label" style="top:40px;left:50%;transform:translateX(-50%)">花枝</div></div>
+  </div>
+  <div class="section-title">点击部位了解更多</div>
+  <div class="parts-grid">
+    <div class="part-chip"><div class="dot-s" style="background:#EC407A"></div><span>🌸 花瓣</span></div>
+    <div class="part-chip"><div class="dot-s" style="background:#FFB347"></div><span>✨ 花蕊</span></div>
+    <div class="part-chip"><div class="dot-s" style="background:#66BB6A"></div><span>🍃 叶子</span></div>
+    <div class="part-chip"><div class="dot-s" style="background:#4FC3F7"></div><span>🌿 花枝</span></div>
+  </div>
+  <div class="info-row">
+    <div class="info-mini"><div class="i1">🎨</div><div class="i2">颜色</div><div class="i3">粉白色</div></div>
+    <div class="info-mini"><div class="i1">👃</div><div class="i2">气味</div><div class="i3">淡淡清香</div></div>
+    <div class="info-mini"><div class="i1">🍃</div><div class="i2">特征</div><div class="i3">常见五瓣</div></div>
+  </div>
+  <div class="action-bar">
+    <div class="ab" style="background:linear-gradient(135deg,#F48FB1,#EC407A);color:#fff">🔊 介绍</div>
+    <div class="ab" style="background:linear-gradient(135deg,#81D4FA,#4FC3F7);color:#fff">🔄 再来</div>
+    <div class="ab" style="background:linear-gradient(135deg,#CE93D8,#AB47BC);color:#fff">🔮 多角度</div>
+  </div>
+</div>
+</div>
+<div class="phone-label">PAGE 8 · 花草探索页</div>
+</div>
+
+<!-- 9 食物特写 -->
+<div class="phone-wrap">
+<div class="phone">
+<div class="notch"></div>
+<div class="statusbar"><span>9:49</span><span>🔋 92%</span></div>
+<div class="page" style="background:#FFFBF0">
+  <div class="page-tag">页面 9 · 食物特写</div>
+  <div class="top-bar"><div class="back-btn" style="background:#FFD166">←</div><div class="page-title">香蕉皮 🔍</div><div class="cat-pill" style="background:#FFB347">食物</div></div>
+  <div class="detail-card">
+    <div class="detail-img" style="background:linear-gradient(135deg,#FFF3CC,#FFD166)">🍌<div class="zoom-badge">🔍 果皮特写</div></div>
+    <div class="detail-body"><div class="detail-name">香蕉 · 果皮</div><div class="detail-tag" style="background:#FFB347">🍎 食物 · 外层保护</div><div class="karaoke">香蕉皮是<span class="hi" style="color:#FFB347;background:#FFF3CC">黄色</span>的，<br>摸起来<span class="hi" style="color:#4FC3F7;background:#E3F6FF">滑滑的</span>，<br>要<span class="hi" style="color:#66BB6A;background:#E8F5E9">剥开</span>才能吃到里面的果肉哦。</div><div class="audio-bar"><div class="audio-prog" style="background:linear-gradient(90deg,#FFB347,#FFD166)"></div></div></div>
+  </div>
+  <div class="fact-cards">
+    <div class="fact-card"><div class="fe">🎨</div><div class="fl">颜色</div><div class="fv">黄色</div></div>
+    <div class="fact-card"><div class="fe">👅</div><div class="fl">口感</div><div class="fv">不能直接吃</div></div>
+    <div class="fact-card"><div class="fe">🍽️</div><div class="fl">吃法</div><div class="fv">先剥再吃</div></div>
+  </div>
+  <div class="section-title">相关部位</div>
+  <div class="related-list">
+    <div class="related-item"><div class="r1">🍌</div><div class="r2">果肉</div><div class="r3">甜甜软软</div></div>
+    <div class="related-item"><div class="r1">🟢</div><div class="r2">果柄</div><div class="r3">连接枝条</div></div>
+    <div class="related-item"><div class="r1">🔴</div><div class="r2">果尖</div><div class="r3">一头尖尖</div></div>
+  </div>
+  <div class="next-btn" style="background:linear-gradient(135deg,#FFD166,#FFB347);color:#3D2C00">👉 下一个部位</div>
+</div>
+</div>
+<div class="phone-label">PAGE 9 · 食物特写</div>
+</div>
+
+<!-- 10 动物特写 -->
+<div class="phone-wrap">
+<div class="phone">
+<div class="notch"></div>
+<div class="statusbar"><span>9:50</span><span>🔋 91%</span></div>
+<div class="page" style="background:#FFFBF0">
+  <div class="page-tag">页面 10 · 动物特写</div>
+  <div class="top-bar"><div class="back-btn" style="background:#A5D6A7">←</div><div class="page-title">黑眼圈 🔍</div><div class="cat-pill" style="background:#66BB6A">动物</div></div>
+  <div class="detail-card">
+    <div class="detail-img" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9)">🐼<div class="zoom-badge">🔍 眼圈特写</div></div>
+    <div class="detail-body"><div class="detail-name">熊猫 · 黑眼圈</div><div class="detail-tag" style="background:#66BB6A">🐼 动物 · 面部特征</div><div class="karaoke">熊猫的黑眼圈是它最有名的<span class="hi" style="color:#66BB6A;background:#E8F5E9">外貌特点</span>，<br>每只熊猫的眼圈形状都有点<span class="hi" style="color:#4FC3F7;background:#E3F6FF">不一样</span>，<br>这样更容易让同伴<span class="hi" style="color:#FFB347;background:#FFF3CC">认出来</span>。</div><div class="audio-bar"><div class="audio-prog" style="background:linear-gradient(90deg,#66BB6A,#A5D6A7)"></div></div></div>
+  </div>
+  <div class="fact-cards">
+    <div class="fact-card"><div class="fe">🎨</div><div class="fl">颜色</div><div class="fv">黑色</div></div>
+    <div class="fact-card"><div class="fe">🐾</div><div class="fl">习性</div><div class="fv">帮助识别</div></div>
+    <div class="fact-card"><div class="fe">💡</div><div class="fl">趣味</div><div class="fv">形状都不同</div></div>
+  </div>
+  <div class="section-title">相关部位</div>
+  <div class="related-list">
+    <div class="related-item"><div class="r1">🖤</div><div class="r2">耳朵</div><div class="r3">圆圆的</div></div>
+    <div class="related-item"><div class="r1">🐾</div><div class="r2">熊爪</div><div class="r3">有力量</div></div>
+    <div class="related-item"><div class="r1">🔘</div><div class="r2">尾巴</div><div class="r3">短短的</div></div>
+  </div>
+  <div class="next-btn" style="background:linear-gradient(135deg,#A5D6A7,#66BB6A);color:#fff">👉 下一个部位</div>
+</div>
+</div>
+<div class="phone-label">PAGE 10 · 动物特写</div>
+</div>
+
+<!-- 11 花草特写 -->
+<div class="phone-wrap">
+<div class="phone">
+<div class="notch"></div>
+<div class="statusbar"><span>9:51</span><span>🔋 90%</span></div>
+<div class="page" style="background:#FFFBF0">
+  <div class="page-tag">页面 11 · 花草特写</div>
+  <div class="top-bar"><div class="back-btn" style="background:#F48FB1">←</div><div class="page-title">花瓣 🔍</div><div class="cat-pill" style="background:#EC407A">花草</div></div>
+  <div class="detail-card">
+    <div class="detail-img" style="background:linear-gradient(135deg,#FCE4EC,#F48FB1)">🌸<div class="zoom-badge">🔍 花瓣特写</div></div>
+    <div class="detail-body"><div class="detail-name">樱花 · 花瓣</div><div class="detail-tag" style="background:#EC407A">🌸 花草 · 花朵部分</div><div class="karaoke">樱花的花瓣常常是<span class="hi" style="color:#EC407A;background:#FCE4EC">粉白色</span>，<br>闻起来有一点点<span class="hi" style="color:#4FC3F7;background:#E3F6FF">淡香</span>，<br>风吹过的时候会像<span class="hi" style="color:#AB47BC;background:#F3E5F5">小雪花</span>一样飘下来。</div><div class="audio-bar"><div class="audio-prog" style="background:linear-gradient(90deg,#EC407A,#F48FB1)"></div></div></div>
+  </div>
+  <div class="fact-cards">
+    <div class="fact-card"><div class="fe">🎨</div><div class="fl">颜色</div><div class="fv">粉白色</div></div>
+    <div class="fact-card"><div class="fe">👃</div><div class="fl">气味</div><div class="fv">淡淡清香</div></div>
+    <div class="fact-card"><div class="fe">🍃</div><div class="fl">特征</div><div class="fv">常见五瓣</div></div>
+  </div>
+  <div class="section-title">相关部位</div>
+  <div class="related-list">
+    <div class="related-item"><div class="r1">✨</div><div class="r2">花蕊</div><div class="r3">在中间</div></div>
+    <div class="related-item"><div class="r1">🍃</div><div class="r2">叶子</div><div class="r3">绿色细小</div></div>
+    <div class="related-item"><div class="r1">🌿</div><div class="r2">花枝</div><div class="r3">支撑花朵</div></div>
+  </div>
+  <div class="next-btn" style="background:linear-gradient(135deg,#F48FB1,#EC407A);color:#fff">👉 下一个部位</div>
+</div>
+</div>
+<div class="phone-label">PAGE 11 · 花草特写</div>
+</div>
+
+<!-- 12 食物列表 -->
+<div class="phone-wrap">
+<div class="phone">
+<div class="notch"></div>
+<div class="statusbar"><span>9:52</span><span>🔋 89%</span></div>
+<div class="page" style="background:#FFFBF0">
+  <div class="page-tag">页面 12 · 食物列表</div>
+  <div class="top-bar"><div class="back-btn" style="background:#FFD166">←</div><div class="page-title">食物图鉴</div><div class="cat-pill" style="background:#FFB347">食物</div></div>
+  <div class="search-bar"><div class="s1">🔎</div><div class="s2">搜索水果、蔬菜、零食…</div></div>
+  <div class="filter-row">
+    <div class="filter-chip active" style="background:#FFB347">全部</div>
+    <div class="filter-chip">水果</div><div class="filter-chip">蔬菜</div><div class="filter-chip">主食</div><div class="filter-chip">甜品</div>
+  </div>
+  <div class="grid-list">
+    <div class="list-card" style="background:linear-gradient(135deg,#FFF3CC,#FFD166)"><div class="lc1">🍌</div><div class="lc2">香蕉</div><div class="lc3">果皮、果肉、果柄</div><div class="lc4">已探索</div></div>
+    <div class="list-card" style="background:linear-gradient(135deg,#FFF3CC,#FFE08A)"><div class="lc1">🍎</div><div class="lc2">苹果</div><div class="lc3">果皮、果核、果柄</div><div class="lc4">开始探索</div></div>
+    <div class="list-card" style="background:linear-gradient(135deg,#FFF3CC,#FFD166)"><div class="lc1">🍉</div><div class="lc2">西瓜</div><div class="lc3">瓜皮、果肉、种子</div><div class="lc4">开始探索</div></div>
+    <div class="list-card" style="background:linear-gradient(135deg,#FFF3CC,#FFE08A)"><div class="lc1">🥕</div><div class="lc2">胡萝卜</div><div class="lc3">根部、叶子、切面</div><div class="lc4">开始探索</div></div>
+  </div>
+</div>
+</div>
+<div class="phone-label">PAGE 12 · 食物列表</div>
+</div>
+
+<!-- 13 动物列表 -->
+<div class="phone-wrap">
+<div class="phone">
+<div class="notch"></div>
+<div class="statusbar"><span>9:53</span><span>🔋 88%</span></div>
+<div class="page" style="background:#FFFBF0">
+  <div class="page-tag">页面 13 · 动物列表</div>
+  <div class="top-bar"><div class="back-btn" style="background:#A5D6A7">←</div><div class="page-title">动物图鉴</div><div class="cat-pill" style="background:#66BB6A">动物</div></div>
+  <div class="search-bar"><div class="s1">🔎</div><div class="s2">搜索陆地、海洋、昆虫…</div></div>
+  <div class="filter-row">
+    <div class="filter-chip active" style="background:#66BB6A">全部</div>
+    <div class="filter-chip">陆地</div><div class="filter-chip">海洋</div><div class="filter-chip">天空</div><div class="filter-chip">昆虫</div>
+  </div>
+  <div class="grid-list">
+    <div class="list-card" style="background:linear-gradient(135deg,#E8F5E9,#A5D6A7)"><div class="lc1">🐼</div><div class="lc2">熊猫</div><div class="lc3">耳朵、眼圈、尾巴</div><div class="lc4">已探索</div></div>
+    <div class="list-card" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9)"><div class="lc1">🦁</div><div class="lc2">狮子</div><div class="lc3">鬃毛、尾巴、爪子</div><div class="lc4">开始探索</div></div>
+    <div class="list-card" style="background:linear-gradient(135deg,#E8F5E9,#A5D6A7)"><div class="lc1">🐬</div><div class="lc2">海豚</div><div class="lc3">背鳍、嘴巴、尾鳍</div><div class="lc4">开始探索</div></div>
+    <div class="list-card" style="background:linear-gradient(135deg,#E8F5E9,#C8E6C9)"><div class="lc1">🦋</div><div class="lc2">蝴蝶</div><div class="lc3">翅膀、触角、身体</div><div class="lc4">开始探索</div></div>
+  </div>
+</div>
+</div>
+<div class="phone-label">PAGE 13 · 动物列表</div>
+</div>
+
+<!-- 14 花草列表 -->
+<div class="phone-wrap">
+<div class="phone">
+<div class="notch"></div>
+<div class="statusbar"><span>9:54</span><span>🔋 87%</span></div>
+<div class="page" style="background:#FFFBF0">
+  <div class="page-tag">页面 14 · 花草列表</div>
+  <div class="top-bar"><div class="back-btn" style="background:#F48FB1">←</div><div class="page-title">花草图鉴</div><div class="cat-pill" style="background:#EC407A">花草</div></div>
+  <div class="search-bar"><div class="s1">🔎</div><div class="s2">搜索花朵、树木、叶片…</div></div>
+  <div class="filter-row">
+    <div class="filter-chip active" style="background:#EC407A">全部</div>
+    <div class="filter-chip">花朵</div><div class="filter-chip">树木</div><div class="filter-chip">叶子</div><div class="filter-chip">草本</div>
+  </div>
+  <div class="grid-list">
+    <div class="list-card" style="background:linear-gradient(135deg,#FCE4EC,#F48FB1)"><div class="lc1">🌸</div><div class="lc2">樱花</div><div class="lc3">花瓣、花蕊、花枝</div><div class="lc4">已探索</div></div>
+    <div class="list-card" style="background:linear-gradient(135deg,#FCE4EC,#F8BBD0)"><div class="lc1">🌻</div><div class="lc2">向日葵</div><div class="lc3">花盘、花瓣、叶子</div><div class="lc4">开始探索</div></div>
+    <div class="list-card" style="background:linear-gradient(135deg,#FCE4EC,#F48FB1)"><div class="lc1">🎍</div><div class="lc2">竹子</div><div class="lc3">竹节、叶片、枝条</div><div class="lc4">开始探索</div></div>
+    <div class="list-card" style="background:linear-gradient(135deg,#FCE4EC,#F8BBD0)"><div class="lc1">🌹</div><div class="lc2">玫瑰</div><div class="lc3">花瓣、刺、叶片</div><div class="lc4">开始探索</div></div>
+  </div>
+</div>
+</div>
+<div class="phone-label">PAGE 14 · 花草列表</div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "name": "kids-explorer-frontend",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev:mp-weixin": "uni -p mp-weixin",
+    "build:mp-weixin": "uni build -p mp-weixin"
+  },
+  "dependencies": {
+    "@dcloudio/uni-app": "latest",
+    "@dcloudio/uni-cli-i18n": "^2.0.2-5000720260410001",
+    "@dcloudio/uni-cli-shared": "^2.0.2-5000720260410001",
+    "@dcloudio/uni-components": "latest",
+    "@dcloudio/uni-mp-weixin": "latest",
+    "pinia": "^3.0.3",
+    "semver": "^7.7.4",
+    "vue": "^3.5.22",
+    "webpack": "^5.106.2"
+  },
+  "devDependencies": {
+    "@dcloudio/types": "latest",
+    "@dcloudio/vite-plugin-uni": "latest",
+    "sass": "^1.93.2",
+    "typescript": "^5.9.3",
+    "vite": "^5.4.21"
+  }
+}

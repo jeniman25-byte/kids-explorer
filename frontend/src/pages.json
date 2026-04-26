@@ -1,0 +1,39 @@
+{
+  "pages": [
+    { "path": "pages/index/index", "style": { "navigationBarTitleText": "小探索家" } },
+    { "path": "pages/generating/index", "style": { "navigationBarTitleText": "生成中", "navigationStyle": "custom" } },
+    { "path": "pages/multiview/index", "style": { "navigationBarTitleText": "多角度探索" } },
+    { "path": "pages/multiview/detail", "style": { "navigationBarTitleText": "部位特写" } },
+    { "path": "pages/food/index/index", "style": { "navigationBarTitleText": "食物探索" } },
+    { "path": "pages/food/explore/index", "style": { "navigationBarTitleText": "食物探索" } },
+    { "path": "pages/food/detail/index", "style": { "navigationBarTitleText": "部位特写" } },
+    { "path": "pages/food/list/index", "style": { "navigationBarTitleText": "食物图鉴" } },
+    { "path": "pages/animal/index/index", "style": { "navigationBarTitleText": "动物探索" } },
+    { "path": "pages/animal/explore/index", "style": { "navigationBarTitleText": "动物探索" } },
+    { "path": "pages/animal/detail/index", "style": { "navigationBarTitleText": "部位特写" } },
+    { "path": "pages/animal/list/index", "style": { "navigationBarTitleText": "动物图鉴" } },
+    { "path": "pages/plant/index/index", "style": { "navigationBarTitleText": "花草探索" } },
+    { "path": "pages/plant/explore/index", "style": { "navigationBarTitleText": "花草探索" } },
+    { "path": "pages/plant/detail/index", "style": { "navigationBarTitleText": "部位特写" } },
+    { "path": "pages/plant/list/index", "style": { "navigationBarTitleText": "花草图鉴" } }
+  ],
+  "tabBar": {
+    "color": "#A07840",
+    "selectedColor": "#FFB347",
+    "backgroundColor": "#FFFBF0",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "探索",
+        "iconPath": "static/tab/explore.png",
+        "selectedIconPath": "static/tab/explore-active.png"
+      },
+      {
+        "pagePath": "pages/food/list/index",
+        "text": "图鉴",
+        "iconPath": "static/tab/book.png",
+        "selectedIconPath": "static/tab/book-active.png"
+      }
+    ]
+  }
+}
