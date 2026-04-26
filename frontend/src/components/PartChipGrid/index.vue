@@ -6,7 +6,7 @@
       :key="part.id"
       class="chip"
       :class="{ 'chip--active': selectedPartId === part.id }"
-      @tap="emit('select', part)"
+      @tap="handleSelect(part)"
     >
       <view class="dot" :style="{ background: part.color }" />
       <view class="name">{{ part.name }}</view>
@@ -16,6 +16,7 @@
 
 <script setup lang="ts">
 import type { SubjectPart } from '@/store/explorerStore'
+import { vibrateShort } from '@/utils/feedback'
 
 defineProps<{
   parts: SubjectPart[]
@@ -25,6 +26,11 @@ defineProps<{
 const emit = defineEmits<{
   (event: 'select', part: SubjectPart): void
 }>()
+
+function handleSelect(part: SubjectPart) {
+  vibrateShort()
+  emit('select', part)
+}
 </script>
 
 <style scoped lang="scss">

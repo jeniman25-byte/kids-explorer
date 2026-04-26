@@ -11,6 +11,8 @@ class Settings(BaseSettings):
     openai_api_key: str
     claude_api_key: str
     app_token: str
+    wechat_appid: str = ""
+    wechat_secret: str = ""
 
     port: int = 8000
     env: str = "development"

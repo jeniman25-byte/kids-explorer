@@ -13,7 +13,7 @@
       :key="part.id"
       class="marker"
       :style="markerStyle(part, idx)"
-      @tap="emit('select', part)"
+      @tap="handleSelect(part)"
     >
       <view class="marker-text">{{ part.shortName }}</view>
     </view>
@@ -24,6 +24,7 @@
 import { getCurrentInstance, onMounted, watch } from 'vue'
 
 import type { SubjectPart } from '@/store/explorerStore'
+import { vibrateShort } from '@/utils/feedback'
 
 const MARKER_COLORS = ['#FFB347', '#4FC3F7', '#66BB6A', '#F06292']
 
@@ -35,6 +36,11 @@ const props = defineProps<{
 const emit = defineEmits<{
   (event: 'select', part: SubjectPart): void
 }>()
+
+function handleSelect(part: SubjectPart) {
+  vibrateShort()
+  emit('select', part)
+}
 
 const instance = getCurrentInstance()
 const canvasId = `subject-canvas-${instance?.uid ?? 'default'}`

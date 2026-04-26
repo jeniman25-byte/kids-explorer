@@ -50,6 +50,7 @@ import FactCards from '@/components/FactCards/index.vue'
 import RelatedParts from '@/components/RelatedParts/index.vue'
 import { useExplorerStore, type SubjectPart } from '@/store/explorerStore'
 import { getCategoryConfig, type Category } from '@/utils/category'
+import { vibrateShort } from '@/utils/feedback'
 
 const props = defineProps<{
   category: Category
@@ -142,6 +143,7 @@ function initCurrentPartId() {
 }
 
 function switchPart(partId: string) {
+  vibrateShort()
   currentPartId.value = partId
   explorerStore.setCurrentPartId(partId)
 }
@@ -150,12 +152,14 @@ function nextPart() {
   if (parts.value.length === 0) {
     return
   }
+  vibrateShort()
   const currentIndex = parts.value.findIndex((part) => part.id === currentPartId.value)
   const nextIndex = currentIndex < 0 ? 0 : (currentIndex + 1) % parts.value.length
   switchPart(parts.value[nextIndex].id)
 }
 
 function goBack() {
+  vibrateShort()
   uni.navigateBack({
     fail: () => {
       uni.navigateTo({

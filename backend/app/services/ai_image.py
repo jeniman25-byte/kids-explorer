@@ -8,6 +8,7 @@ from sqlalchemy import select
 from app.config import settings
 from app.database import AsyncSessionLocal
 from app.models import Image
+from app.services.wechat_security import img_sec_check
 
 IMAGE_PROMPTS = {
     "food": lambda name, view: (
@@ -190,6 +191,9 @@ async def _generate_and_store_phase(
             view_type=view_type,
             seed=seed + index,
         )
+        is_safe = await img_sec_check(image_url)
+        if not is_safe:
+            image_url = _fallback_image_url(subject_id, view_type, seed + index + 999)
         await _upsert_image(subject_id, view_type, image_url)
         await _sync_status_with_db(subject_id)
 

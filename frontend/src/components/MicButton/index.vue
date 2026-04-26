@@ -22,6 +22,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { vibrateShort } from '@/utils/feedback'
 
 const props = withDefaults(
   defineProps<{
@@ -66,6 +67,7 @@ function handleLongPress() {
   if (props.disabled) {
     return
   }
+  vibrateShort('medium')
   emit('record-start')
 }
 
@@ -73,6 +75,7 @@ function handleTouchEnd() {
   if (props.disabled) {
     return
   }
+  vibrateShort()
   emit('record-end')
 }
 </script>

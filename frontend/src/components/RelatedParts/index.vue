@@ -6,7 +6,7 @@
       :key="part.id"
       class="item"
       :class="{ 'item--active': currentPartId === part.id }"
-      @tap="emit('select', part.id)"
+      @tap="handleSelect(part.id)"
     >
       <view class="emoji">{{ part.shortName }}</view>
       <view class="name">{{ part.name }}</view>
@@ -17,6 +17,7 @@
 
 <script setup lang="ts">
 import type { SubjectPart } from '@/store/explorerStore'
+import { vibrateShort } from '@/utils/feedback'
 
 defineProps<{
   parts: SubjectPart[]
@@ -26,6 +27,11 @@ defineProps<{
 const emit = defineEmits<{
   (event: 'select', partId: string): void
 }>()
+
+function handleSelect(partId: string) {
+  vibrateShort()
+  emit('select', partId)
+}
 </script>
 
 <style scoped lang="scss">

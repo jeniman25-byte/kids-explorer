@@ -1,18 +1,8 @@
-<!-- 页面占位：M1 项目骨架，后续里程碑补完整 UI 与交互 -->
+<!-- PAGE 13：动物图鉴列表 -->
 <template>
-  <view class="page-placeholder">页面占位</view>
+  <CatalogPage category="animal" />
 </template>
 
 <script setup lang="ts">
-// 占位页面
+import CatalogPage from '@/components/CatalogPage/index.vue'
 </script>
-
-<style scoped lang="scss">
-.page-placeholder {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #a07840;
-}
-</style>

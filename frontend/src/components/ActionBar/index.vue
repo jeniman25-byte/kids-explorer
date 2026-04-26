@@ -1,14 +1,15 @@
 <!-- 底部操作栏 -->
 <template>
   <view class="bar">
-    <view class="btn btn-primary" :style="primaryStyle" @tap="emit('intro')">🔊 介绍</view>
-    <view class="btn btn-secondary" @tap="emit('retry')">🔄 再来</view>
-    <view class="btn btn-third" @tap="emit('multiview')">🔮 多角度</view>
+    <view class="btn btn-primary" :style="primaryStyle" @tap="handleTap('intro')">🔊 介绍</view>
+    <view class="btn btn-secondary" @tap="handleTap('retry')">🔄 再来</view>
+    <view class="btn btn-third" @tap="handleTap('multiview')">🔮 多角度</view>
   </view>
 </template>
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { vibrateShort } from '@/utils/feedback'
 
 const props = defineProps<{
   primary: string
@@ -19,6 +20,11 @@ const emit = defineEmits<{
   (event: 'retry'): void
   (event: 'multiview'): void
 }>()
+
+function handleTap(event: 'intro' | 'retry' | 'multiview') {
+  vibrateShort()
+  emit(event)
+}
 
 function mixWithWhite(hex: string, ratio: number): string {
   const raw = hex.replace('#', '').trim()

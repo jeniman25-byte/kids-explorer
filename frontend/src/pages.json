@@ -15,7 +15,8 @@
     { "path": "pages/plant/index/index", "style": { "navigationBarTitleText": "花草探索" } },
     { "path": "pages/plant/explore/index", "style": { "navigationBarTitleText": "花草探索" } },
     { "path": "pages/plant/detail/index", "style": { "navigationBarTitleText": "部位特写" } },
-    { "path": "pages/plant/list/index", "style": { "navigationBarTitleText": "花草图鉴" } }
+    { "path": "pages/plant/list/index", "style": { "navigationBarTitleText": "花草图鉴" } },
+    { "path": "pages/privacy/index", "style": { "navigationBarTitleText": "隐私政策" } }
   ],
   "tabBar": {
     "color": "#A07840",

@@ -11,11 +11,18 @@
       <SubjectCanvas :image-url="currentImageUrl" :parts="parts" @select="handleSelectPart" />
     </view>
 
+    <ApiErrorState
+      v-if="errorMessage"
+      title="部位放大镜还在调焦"
+      :message="errorMessage"
+      @retry="fetchVision"
+    />
+
     <view class="section-title">点击部位了解更多</view>
     <PartChipGrid :parts="parts" :selected-part-id="selectedPartId" @select="handleSelectPart" />
     <view class="view-desc">{{ viewDescription }}</view>
     <InfoRow :category="props.category" :info="infoRow" />
-    <ActionBar :primary="config.primary" @intro="openCurrentPartDetail" @retry="retryExplore" @multiview="openMultiview" />
+    <ActionBar :primary="config.primary" @intro="speakPartsIntro" @retry="retryExplore" @multiview="openMultiview" />
 
     <PartDetailSheet
       :visible="sheetVisible"
@@ -27,9 +34,10 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue'
 
 import ActionBar from '@/components/ActionBar/index.vue'
+import ApiErrorState from '@/components/ApiErrorState/index.vue'
 import InfoRow from '@/components/InfoRow/index.vue'
 import PartChipGrid from '@/components/PartChipGrid/index.vue'
 import PartDetailSheet from '@/components/PartDetailSheet/index.vue'
@@ -37,6 +45,8 @@ import SubjectCanvas from '@/components/SubjectCanvas/index.vue'
 import { useExplorerStore, type SubjectPart } from '@/store/explorerStore'
 import request from '@/utils/request'
 import { getCategoryConfig, type Category } from '@/utils/category'
+import { vibrateShort } from '@/utils/feedback'
+import { getTtsAudioBase64 } from '@/utils/tts'
 
 interface VisionApiPart {
   id: string
@@ -70,6 +80,7 @@ const infoRow = ref<Record<string, string>>({})
 const viewDescription = ref('正在观察这个对象的关键部位～')
 const sheetVisible = ref(false)
 const selectedPartId = ref<string | null>(null)
+const errorMessage = ref('')
 
 const subjectName = computed(() => explorerStore.currentSubject?.name ?? config.value.quickCards[0].name)
 const subjectEmoji = computed(() => explorerStore.currentSubject?.emoji ?? config.value.emoji)
@@ -88,6 +99,8 @@ const pageVars = computed(() => ({
   '--light': config.value.light,
   '--dark': config.value.dark,
 }))
+
+let introAudioContext: UniApp.InnerAudioContext | null = null
 
 function ensureApiToken() {
   const token = uni.getStorageSync('token') as string | undefined
@@ -162,6 +175,7 @@ function hydrateFallback() {
 }
 
 async function fetchVision() {
+  errorMessage.value = ''
   if (!subjectId.value || !currentImageUrl.value) {
     hydrateFallback()
     return
@@ -193,10 +207,7 @@ async function fetchVision() {
   } catch (error) {
     console.error('[vision] request failed:', error)
     hydrateFallback()
-    uni.showToast({
-      title: '部位识别失败，先看示例点位',
-      icon: 'none',
-    })
+    errorMessage.value = '部位识别暂时卡住了，我们再试一次吧～'
   }
 }
 
@@ -207,6 +218,7 @@ function handleSelectPart(part: SubjectPart) {
 }
 
 function goBack() {
+  vibrateShort()
   uni.navigateBack({
     fail: () => {
       uni.switchTab({
@@ -216,23 +228,56 @@ function goBack() {
   })
 }
 
-function openCurrentPartDetail() {
-  const target = selectedPartId.value ?? parts.value[0]?.id
-  if (!target) {
+function ensureIntroAudioContext(): UniApp.InnerAudioContext {
+  if (introAudioContext) {
+    return introAudioContext
+  }
+
+  introAudioContext = uni.createInnerAudioContext()
+  introAudioContext.autoplay = false
+  introAudioContext.obeyMuteSwitch = false
+  introAudioContext.onError(() => {
+    uni.showToast({
+      title: '介绍语音播放失败',
+      icon: 'none',
+    })
+  })
+  return introAudioContext
+}
+
+async function speakPartsIntro() {
+  vibrateShort()
+  if (parts.value.length === 0) {
     return
   }
-  uni.navigateTo({
-    url: `/pages/${props.category}/detail/index?partId=${encodeURIComponent(target)}`,
-  })
+
+  const names = parts.value.map((part) => part.name).join('、')
+  const introText = `现在我们来认识${subjectName.value}的部位：${names}。`
+
+  try {
+    const audioBase64 = await getTtsAudioBase64(introText)
+    const ctx = ensureIntroAudioContext()
+    ctx.stop()
+    ctx.src = audioBase64
+    ctx.play()
+  } catch (error) {
+    console.error('[tts] intro playback failed:', error)
+    uni.showToast({
+      title: '介绍语音生成失败',
+      icon: 'none',
+    })
+  }
 }
 
 function retryExplore() {
+  vibrateShort()
   uni.navigateTo({
     url: `/pages/${props.category}/index/index`,
   })
 }
 
 function openMultiview() {
+  vibrateShort()
   uni.navigateTo({
     url: '/pages/multiview/index',
   })
@@ -241,6 +286,14 @@ function openMultiview() {
 onMounted(() => {
   explorerStore.setCurrentCategory(props.category)
   void fetchVision()
+})
+
+onBeforeUnmount(() => {
+  if (introAudioContext) {
+    introAudioContext.stop()
+    introAudioContext.destroy()
+    introAudioContext = null
+  }
 })
 </script>
 

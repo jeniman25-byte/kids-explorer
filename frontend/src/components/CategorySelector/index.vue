@@ -21,6 +21,7 @@
 import { computed } from 'vue'
 
 import { CATEGORY_CONFIG, type Category } from '@/utils/category'
+import { vibrateShort } from '@/utils/feedback'
 
 type SelectorMode = 'overview' | 'category'
 
@@ -70,6 +71,7 @@ function cardStyle(category: Category) {
 }
 
 function handleChange(category: Category) {
+  vibrateShort()
   emit('change', category)
 }
 </script>
